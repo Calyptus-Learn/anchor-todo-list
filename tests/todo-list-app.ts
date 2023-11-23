@@ -119,21 +119,25 @@ describe("todo-list-app", () => {
   //   assert.equal(taskAccount.isDone, true);
   // });
 
-  // it("cannot create a task with more than 400 characters", async () => {
-  //   const task = anchor.web3.Keypair.generate();
-  //   try {
-  //     await program.methods
-  //       .addingTask("You are awesome".repeat(100))
-  //       .accounts({
-  //         task: task.publicKey,
-  //         author: author.wallet.publicKey,
-  //         systemProgram: anchor.web3.SystemProgram.programId,
-  //       })
-  //       .signers([task])
-  //       .rpc();
-  //     assert.fail("Expected an error");
-  //   } catch (err) {
-  //     assert.equal(err.toString(), "Error: failed to send transaction");
-  //   }
-  // });
+  it("cannot create a task with more than 400 characters", async () => {
+    const task = anchor.web3.Keypair.generate();
+    try {
+      // Adjust the string length as needed
+      const longString = "You are awesome".repeat(25); // Adjust to find the right length
+      await program.methods
+        .addingTask(longString)
+        .accounts({
+          task: task.publicKey,
+          author: author.wallet.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([task])
+        .rpc();
+      assert.fail("Expected a TextTooLong error");
+    } catch (err) {
+      // Check for specific smart contract error
+      assert.include(err.toString(), "TextTooLong");
+    }
+});
+
 });
